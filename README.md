@@ -232,4 +232,4 @@ $ dumpe2fs /dev/sda3 | grep -i "inode size"
 + http://crazyadmins.com/tune-hadoop-cluster-to-get-maximum-performance-part-1/
 + http://crazyadmins.com/tune-hadoop-cluster-to-get-maximum-performance-part-2/
 + https://www.systutorials.com/241362/how-to-find-the-datanodes-that-actually-store-a-file-in-hdfs/
-
++ http://hadooptutorial.info/hadoop-performance-tuning/
