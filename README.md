@@ -50,8 +50,15 @@ I/O size (minimum/optimal): 512 bytes / 512 bytes
 在三台机器上执行一下命令：
 ```shell
 $ dd if=/dev/vda bs=1M of=/dev/null count=1k
-vda 250M/s
-vdb 60M/s
+1024+0 records in
+1024+0 records out
+1073741824 bytes (1.1 GB) copied, 5.18163 s, 207 MB/s
+```
+```shell
+$ dd if=/dev/vdb bs=1M of=/dev/null count=1k
+1024+0 records in
+1024+0 records out
+1073741824 bytes (1.1 GB) copied, 11.4596 s, 93.7 MB/s
 ```
 #### hdfs数据目录所在分区
 ```shell 
@@ -221,4 +228,8 @@ $ dumpe2fs /dev/sda3 | grep -i "inode size"
 
 ## 参考资料
 + http://www.brendangregg.com/USEmethod/use-rosetta.html
++ https://community.hortonworks.com/articles/43838/scaling-the-hdfs-namenode-part-1.html
 + http://crazyadmins.com/tune-hadoop-cluster-to-get-maximum-performance-part-1/
++ http://crazyadmins.com/tune-hadoop-cluster-to-get-maximum-performance-part-2/
++ https://www.systutorials.com/241362/how-to-find-the-datanodes-that-actually-store-a-file-in-hdfs/
+
