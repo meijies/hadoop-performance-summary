@@ -6,7 +6,46 @@ TODO
 ## 操作系统调优
 ### 查看磁盘性能
 #### 列出所有逻辑卷
-fdisk -l
+```shell
+$ fdisk -l
+Disk /dev/vda: 1099.5 GB, 1099511627776 bytes, 2147483648 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0x000d1e52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vda1   *        2048     2099199     1048576   83  Linux
+/dev/vda2         2099200  2147483647  1072692224   8e  Linux LVM
+
+Disk /dev/vdb: 1099.5 GB, 1099511627776 bytes, 2147483648 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0x85eb7157
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1            2048  2147483647  1073740800   83  Linux
+
+Disk /dev/mapper/centos-root: 53.7 GB, 53687091200 bytes, 104857600 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/mapper/centos-swap: 4294 MB, 4294967296 bytes, 8388608 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/mapper/centos-home: 1040.5 GB, 1040451633152 bytes, 2032132096 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+```
 #### 查看所有逻辑卷的读写速度
 在三台机器上执行一下命令：
 ```shell
@@ -22,7 +61,7 @@ Filesystem               Size  Used Avail Use% Mounted on
 ```
 
 ```shell
-df /data/hadoop/
+$ df /data/hadoop/
 Filesystem      1K-blocks     Used Available Use% Mounted on
 /dev/vdb1      1056757172 96439960 906613788  10% /data
 ```
@@ -32,10 +71,13 @@ Filesystem      1K-blocks     Used Available Use% Mounted on
 ### 文件系统检查
 #### 查看文件系统
 ```shell
-$ parted /dev/sdb1
-> print list
+$ df -Th | grep "^/dev"
+/dev/mapper/centos-root xfs        50G   22G   29G  44% /
+/dev/vdb1               ext4     1008G   93G  864G  10% /data
+/dev/vda1               xfs      1014M  142M  873M  14% /boot
+/dev/mapper/centos-home xfs       969G   33M  969G   1% /home
 ```
-文件系统为ext4
+[ ] 应该使用ext4文件系统，补充不同文件系统的区别
 #### 没有启用noatime
 noatime，不更新文件系统目录的访问时间
 
@@ -47,9 +89,7 @@ noatime，不更新文件系统目录的访问时间
 由于当前集群不是一个很忙的集群，以下参数可以接受
 sysctl -a --pattern ".*somaxconn*"
 net.core.somaxconn = 128
-
 + sysctl -w vm.swappiness=0
-
 + vm.dirty_background_ratio=20 
 内存中可以填充脏数据的百分比
 + vm.dirty_ratio=50 
@@ -61,7 +101,6 @@ net.core.somaxconn = 128
 
 + 禁用透明大页压缩，这会导致cpu过载
 echo never > /sys/kernel/mm/redhat_transparent_hugepages/defrag
-
 
 ### HDFS调优
 + 如果是一个很大的集群，du可能会导致一些过载
@@ -152,7 +191,7 @@ current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/subdir0/subdi
 ```
 ##### 查看数据块文件的缓存情况
 ```shell
-vmtouch current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/subdir0/subdir3/blk_1073742608
+$ vmtouch current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/subdir0/subdir3/blk_1073742608
            Files: 1
      Directories: 0
   Resident Pages: 0/1  0/4K  0%
@@ -173,7 +212,7 @@ vmtouch current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/subdi
 
 #### 查看磁盘INODE的大小
 ``` shell
-dumpe2fs /dev/sda3 | grep -i "inode size"
+$ dumpe2fs /dev/sda3 | grep -i "inode size"
 ```
 [inode相关信息](https://www.ibm.com/developerworks/cn/aix/library/au-speakingunix14/)
 
