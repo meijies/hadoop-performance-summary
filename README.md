@@ -9,29 +9,32 @@ TODO
 fdisk -l
 #### 查看所有逻辑卷的读写速度
 在三台机器上执行一下命令：
-dd if=/dev/vda bs=1M of=/dev/null count=1k
+```shell
+$ dd if=/dev/vda bs=1M of=/dev/null count=1k
 vda 250M/s
 vdb 60M/s
+```
 #### hdfs数据目录所在分区
 ```shell 
-df /hadoop -h
-```
+$ df /hadoop -h
 Filesystem               Size  Used Avail Use% Mounted on
 /dev/mapper/centos-root   50G   21G   30G  42% /
+```
 
 ```shell
 df /data/hadoop/
-```
 Filesystem      1K-blocks     Used Available Use% Mounted on
 /dev/vdb1      1056757172 96439960 906613788  10% /data
-
+```
 #### 问题
 查询过程中观察到的负载在/dev/vda上，而/hadoop目录所在分区剩余磁盘空间只有30G，小于hadoop要求的保留磁盘空间，所以这个分区不会存储数据块。hive表中的数据应该都存储到/data/hadoop上，/dev/vdb1逻辑存储设备上。而实际观察到的负载在/dev/vda上
 
 ### 文件系统检查
 #### 查看文件系统
-parted /dev/sdb1
-print list
+```shell
+$ parted /dev/sdb1
+> print list
+```
 文件系统为ext4
 #### 没有启用noatime
 noatime，不更新文件系统目录的访问时间
@@ -76,9 +79,9 @@ TODO 整理资料
 
 ### HDFS文件
 #### HDFS文件的磁盘位置
-``** shell
-sudo -u hdfs hdfs fsck /warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000 -files -locations -blocks
-`****
+``` shell
+$ sudo -u hdfs hdfs fsck /warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000 -files -locations -blocks
+
 将得到如下输出：
 Connecting to namenode via http://hdp1:50070/fsck?ugi=hdfs&files=1&locations=1&blocks=1&path=%2Fwarehouse%2Ftablespace%2Fmanaged%2Fhive%2Forc_event%2Fdelta_0000002_0000002_0000
 FSCK started by hdfs (auth:SIMPLE) from /172.16.20.53 for path /warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000 at Wed Dec 19 18:04:38 CST 2018
@@ -129,7 +132,7 @@ FSCK ended at Wed Dec 19 18:04:38 CST 2018 in 1 milliseconds
 
 
 The filesystem under path '/warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000' is HEALTHY
-
+```
 #### HDFS文件的磁盘缓存
 ##### 安装vmtouch
 ```shell
@@ -143,23 +146,19 @@ $ sudo make install
 + 查看hdfs的配置DateNode Directories的路径为: /data/hadoop/hdfs/data
 + 查看数据快文件位置
 ```shell
-ls current/BP-*/current/finalized/subdir0/*/blk_1073742608*
-```
-输出如下：
+$ ls current/BP-*/current/finalized/subdir0/*/blk_1073742608*
 current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/subdir0/subdir3/blk_1073742608
 current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/subdir0/subdir3/blk_1073742608_1784.meta
-
+```
 ##### 查看数据块文件的缓存情况
 ```shell
 vmtouch current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/subdir0/subdir3/blk_1073742608
-```
-输出如下：
            Files: 1
      Directories: 0
   Resident Pages: 0/1  0/4K  0%
          Elapsed: 0.000165 seconds
 **Resident Pages表示内存驻留的页，当前为0**
-
+```
 ###### vmtouch
 + 发现您的操作系统正在缓存哪些文件
 + 告诉操作系统缓存或驱逐某些文件或文件区域
