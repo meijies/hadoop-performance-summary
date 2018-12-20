@@ -120,16 +120,21 @@ TODO 整理资料
 #### HDFS文件的磁盘位置
 ``` shell
 $ sudo -u hdfs hdfs fsck /warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000 -files -locations -blocks
-
-将得到如下输出：
-Connecting to namenode via http://hdp1:50070/fsck?ugi=hdfs&files=1&locations=1&blocks=1&path=%2Fwarehouse%2Ftablespace%2Fmanaged%2Fhive%2Forc_event%2Fdelta_0000002_0000002_0000
-FSCK started by hdfs (auth:SIMPLE) from /172.16.20.53 for path /warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000 at Wed Dec 19 18:04:38 CST 2018
+Connecting to namenode via http://hdp1:50070/fsck?
+ugi=hdfs&files=1&locations=1&blocks=1&path=%2Fwarehouse%2Ftablespace%2Fmanaged%2Fhive%2Forc_event%
+2Fdelta_0000002_0000002_0000FSCK started by hdfs (auth:SIMPLE) from /172.16.20.53 for path 
+/warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000 at Thu Dec 20 15:26:05 CST 2018
 /warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000 <dir>
-/warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000/_orc_acid_version 1 bytes, replicated: replication=3, 1 block(s**:  OK
-0. BP-1544825953-172.16.20.53-1544669696881:**blk_1073742608_1784** len=1 Live_repl=3  [DatanodeInfoWithStorage[172.16.20.53:50010,DS-81ef060e-b753-45a0-951a-938dc933f018,DISK], DatanodeInfoWithStorage[172.16.20.54:50010,DS-1f319a93-4bc5-41e4-945b-625d7586a6ef,DISK], DatanodeInfoWithStorage[172.16.20.74:50010,DS-5f97d7a6-1217-48ef-8aaf-01c999d4c80c,DISK****
+/warehouse/tablespace/managed/hive/orc_event/delta_0000002_0000002_0000/_orc_acid_version 1 bytes, replicated: 
+replication=3, 1 block(s):  OK
+0. BP-1544825953-172.16.20.53-1544669696881:blk_1073742608_1784 len=1 Live_repl=3  
+[DatanodeInfoWithStorage[172.16.20.53:50010,DS-81ef060e-b753-45a0-951a-938dc933f018,DISK], 
+DatanodeInfoWithStorage[172.16.20.54:50010,DS-1f319a93-4bc5-41e4-945b-625d7586a6ef,DISK], 
+DatanodeInfoWithStorage[172.16.20.74:50010,DS-5f97d7a6-1217-48ef-8aaf-01c999d4c80c,DISK]]
+
 ... 此处省略另外10个数据块的信息
 
-**这说明数据块blk_1073742608_1784有3个在线副本，分别位于53, 54, 74机器上
+这说明数据块blk_1073742608_1784有3个在线副本，分别位于53, 54, 74机器上
 
 Status: HEALTHY
  Number of data-nodes:	3
@@ -137,8 +142,7 @@ Status: HEALTHY
  Total dirs:			1
  Total symlinks:		0
 
-** 这里描述的是hdfs里orc_event的小结，一共三个数据节点，一个机架，一个目录**
-
+这里描述的是hdfs里orc_event的小结，一共三个数据节点，一个机架，一个目录
 Replicated Blocks:
  Total size:	1621528981 B
  Total files:	11
@@ -153,8 +157,7 @@ Replicated Blocks:
  Corrupt blocks:		0
  Missing replicas:		0 (0.0 %)
  
- **这里描述该目录下的数据快信息**
-
+这里描述该目录下的数据快信息
 Erasure Coded Block Groups:
  Total size:	0 B
  Total files:	0
