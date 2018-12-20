@@ -84,7 +84,16 @@ $ df -Th | grep "^/dev"
 /dev/vda1               xfs      1014M  142M  873M  14% /boot
 /dev/mapper/centos-home xfs       969G   33M  969G   1% /home
 ```
-[ ] 应该使用ext4文件系统，补充不同文件系统的区别
+#### 文件系统的选择
+| 文件系统类型 | 说明                     |
+| --           | --                       |
+| ext4         |                          |
+| ResierFS     | 针对小型文件具有最佳性能 |
+| XFS          | 针对大型文件具有最佳性能 |
+
++ https://blog.csdn.net/liuzhoulong/article/details/41213253
++ http://blog.chinaunix.net/uid-9460004-id-3294714.html
++ https://blog.csdn.net/zhouchang3/article/details/52996100/
 #### 没有启用noatime
 noatime，不更新文件系统目录的访问时间
 
