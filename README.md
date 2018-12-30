@@ -1,10 +1,13 @@
 # 大数据性能总结
+## 目录
 + [硬件调优](hardware.md)
 + [操作系统调优](system.md)
 + [资源饱和度、利用率、错误度量](use.md)
 + [HDFS调优](hdfs.md)
 
-## [写作规范](https://github.com/ruanyf/document-style-guide)
+## 提交与写作规范
++ [中文技术文档写作规范](https://github.com/ruanyf/document-style-guide)
++ [git提交最佳实践](https://github.com/trein/dev-best-practices/wiki/Git-Commit-Best-Practices)
 
 ## 参考资料
 + http://www.brendangregg.com/USEmethod/use-rosetta.html
