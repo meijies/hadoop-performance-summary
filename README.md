@@ -1,8 +1,10 @@
-# 大数据调优
+# 大数据性能总结
 + [硬件调优](hardware.md)
 + [操作系统调优](system.md)
 + [资源饱和度、利用率、错误度量](use.md)
 + [HDFS调优](hdfs.md)
+
+## [写作规范](https://github.com/ruanyf/document-style-guide)
 
 ## 参考资料
 + http://www.brendangregg.com/USEmethod/use-rosetta.html
