@@ -1,4 +1,14 @@
 ## 操作系统调优
+### 文件系统分区与挂载
++ 主节点
+| 挂载点         | 哪一块磁盘和如何配置       | 描述                                                                           |
+| --             | --                         | --                                                                             |
+| /              | 以镜像方式使用两个500G磁盘 | 确保即使一个磁盘失败，操作系统仍然能够运行                                     |
+| /var/log       | 以镜像方式使用两个2T磁盘   | 完全希望管理员对这个策略有所支持，但只是为了防止日志的大小成为运行时关注的问题 |
+| /hadoop        | 以镜像方式使用两个2T磁盘   |                                                                                |
+| /master/data/1 | 以镜像方式使用两个2T磁盘   | 主要被用于NameNode和JournalNode处理                                            |
+| /master/data/2 | 以镜像方式使用两个2T磁盘   | 同样被用于NameNode和JournalNode,甚至配置HA NameNode.                            |
+
 ### 查看磁盘性能
 #### 列出所有逻辑卷
 ```shell
@@ -113,3 +123,5 @@ net.core.somaxconn = 128
 + 禁用透明大页压缩，这会导致cpu过载
 echo never > /sys/kernel/mm/redhat_transparent_hugepages/defrag
 
+### 参考文章和书籍
++ https://martin.atlassian.net/wiki/spaces/lestermartin/blog/2015/09/02/45580306/hadoop+mount+points+more+art+than+science
