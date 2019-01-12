@@ -140,18 +140,25 @@ noatime，不更新文件系统目录的访问时间
 由于当前集群不是一个很忙的集群，以下参数可以接受
 sysctl -a --pattern ".*somaxconn*"
 net.core.somaxconn = 128
-+ sysctl -w vm.swappiness=0
++ sysctl -w vm.swappiness=1
 + vm.dirty_background_ratio=20 
 内存中可以填充脏数据的百分比
 + vm.dirty_ratio=50 
 绝对脏数据百分比，如果内存中的脏数据超过这个百分比，那么新的IO请求会被阻塞
 
 ### 其他参数
-+ MTU（需要所有服务器支持jumbo frames） 最大传输单元，TCP数据帧的大小，默认设置成1500,这里应该设置成9000
-添加MTU=9000到文件 /etc/sysconfig/network-scripts/ifcfg-eth0，重启网络服务
-
-+ 禁用透明大页压缩，这会导致cpu过载
++ 为性能扩展配置CPU</br>
+执行cpufreq-set -r -g performance </br>
+编辑/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor，并设置为performance </br>
++ MTU（需要所有服务器支持jumbo frames） 最大传输单元，TCP数据帧的大小，默认设置成1500,这里应该设置成9000 </br>
+添加MTU=9000到文件 /etc/sysconfig/network-scripts/ifcfg-eth0，重启网络服务</br>
++ 禁用透明大页压缩，这会导致cpu过载</br>
 echo never > /sys/kernel/mm/redhat_transparent_hugepages/defrag
-
++ 优化固态盘配置
+```shell
+echo 'deadline' > {{device}}/queue/scheduler ; 
+echo '256' > {{device}}/queue/read_ahead_kb ; 
+echo '256' > {{device}}/queue/nr_requests ; 
+```
 ### 参考文章和书籍
 + https://martin.atlassian.net/wiki/spaces/lestermartin/blog/2015/09/02/45580306/hadoop+mount+points+more+art+than+science
