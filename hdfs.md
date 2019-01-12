@@ -2,6 +2,31 @@
 ### HDFS调优
 + 如果是一个很大的集群，du可能会导致一些过载
 fs.du.interval=1200000
++ HDFS块大小： [134217728,1073741824)
++ 启用short-circuit读
+想要启用short-circuit,需要先启用libhadoop.so (dfs.domain.socket.path)
+dfs.client.read.shortcircuit=true
+dfs.domain.socket.path=/var/lib/hadoop-hdfs/dn_socket
++ 避免过多小文件
+  1) 运行hive和hbase压缩
+  2) 合并小文件
+  3) 使用HAR来压缩小文件
++ 优化数据节点JVM配置，配置样例：
+  1)-Djava.net.preferIPv4Stack=true
+  2)-XX:ParallelGCThreads=8
+  3)-XX:+UseConcMarkSweepGC
+  4)-Xloggc:*
+  5)-verbose:gc
+  6)-XX:+PrintGCDetails
+  7)-XX:+PrintGCTimeStamps,
+  8)-XX:+PrintGCDateStamps
+  9)-Xms should be same as -Xmx
+  10)新生代应该是总JVM内存的1/8
++ 避免读写不健康的节点
+dfs.namenode.avoid.read.stale.datanode=true
+dfs.namenode.avoid.write.stale.datanode=true
++ 使用JNI-based group lookup实现
+hadoop.security.group.mapping=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback
 
 ### HADOOP Benchmark
 TODO 整理资料
