@@ -28,6 +28,14 @@ dfs.namenode.avoid.write.stale.datanode=true </br>
 + 使用JNI-based group lookup实现
 hadoop.security.group.mapping=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback
 
+### 利用HDFS支持的内存存储
+HDFS支持写数据到数据节点管理的非堆内存，数据节点会异步地将内存数据刷入磁盘以此减少昂贵的IO操作和checksum计算，
+因此，我们把它称作为懒持久化。HDFS尽最大努力做持久化保证。如果在将副本持久保存到磁盘之前重新启动节点，则可能会丢失数据。
+应用程序可以选择使用Lazy Persist Writes来换取一些持久性保证，以减少延迟。
+
+#### [TODO] 如何配置
+
+
 ### HADOOP Benchmark
 TODO 整理资料
 + https://github.com/intel-hadoop/HiBench/blob/master/docs/build-hibench.md
