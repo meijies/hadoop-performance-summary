@@ -1,4 +1,27 @@
 ## 操作系统调优
+
+### 查看CPU
++ 查看CPU型号
+```shell
+cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c
+```
++ 查看物理CPU数量
+```shell
+cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l
+```
++ 查看每个物理CPU中的核心数
+```shell
+cat /proc/cpuinfo| grep "cpu cores"| uniq
+```
++ 查看逻辑CPU的个数
+```shell
+cat /proc/cpuinfo| grep "processor"| wc -l
+```
++ 是否支持超线程
+```
+逻辑CPU的个数 / (物理CPU数量 * 每个物理CPU的核心数) > 1
+```
+
 ### 文件系统分区
 假定机器配置为：12块2T磁盘外加2块500G的磁盘，双8核处理器，125G内存
 
@@ -38,7 +61,6 @@
 ### 文件系统挂载选项
 + ext4: "inode_readahead_blks=128","data=writeback","noatime","nodev"
 + xfs: "noatime"
-
 
 ### 查看磁盘性能
 #### 列出所有逻辑卷
