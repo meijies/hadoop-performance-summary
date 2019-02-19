@@ -62,6 +62,21 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 + ext4: "inode_readahead_blks=128","data=writeback","noatime","nodev"
 + xfs: "noatime"
 
+### disable系统缓存
+系统缓存可能导致两次测试结果差异很大，而且disable系统缓存的测试非常有意义
+#### 释放pagecache
+```shell
+sync; echo 1 > /proc/sys/vm/drop_caches
+```
+### 释放dentries and inodes cache
+```shell
+sync; echo 2 > /proc/sys/vm/drop_caches
+```
+#### 全部释放
+```shell
+sync; echo 3 > /proc/sys/vm/drop_caches
+```
+
 ### 查看磁盘性能
 #### 列出所有逻辑卷
 ```shell
