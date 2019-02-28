@@ -143,5 +143,12 @@ $ vmtouch current/BP-1544825953-172.16.20.53-1544669696881/current/finalized/sub
 ``` shell
 $ dumpe2fs /dev/sda3 | grep -i "inode size"
 ```
+
+### 常用命令
++ 格式化namenode
+```shell
+sudo -u hdfs hdfs namenode -format
+```
+
 [inode相关信息](https://www.ibm.com/developerworks/cn/aix/library/au-speakingunix14/)
 
