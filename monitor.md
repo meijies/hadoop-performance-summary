@@ -2,8 +2,9 @@
 ### 性能监控平台
 + https://github.com/open-falcon/falcon-plus/
 ### CPU监控
- 在进行CPU性能监控时，我们重点关注系统态CPU使用率。系统态CPU高意味着共享资源竞争，或者IO设备之间有大量交互，降低系统态CPU使用率将成为一个重点目标。对于CPU密集型应用，我们还需要监控每时钟指令数或每指令时钟周期，因为CPU高速缓存未命中时，CPU仍然被报告为繁忙。此外，我们还关注CPU调度和执行特定任务的CPU指令数
-**1)监控CPU使用率**
+ 在进行CPU性能监控时，我们重点关注系统态CPU使用率。系统态CPU高意味着共享资源竞争，或者IO设备之间有大量交互，降低系统态CPU使用率将成为一个重点目标。对于CPU密集型应用，我们还需要监控每时钟指令数或每指令时钟周期，因为CPU高速缓存未命中时，CPU仍然被报告为繁忙。此外，我们还关注CPU调度和执行特定任务的CPU指令数，以及CPU调度程序运行队列。一般性的知道原则是：如果很长一段时间内，运行队列的长度超过了虚拟核心数的一倍，那么就需要特别关注了，如果达到3~4倍，则需要立即注意和采取行动。
+ 
+**1)监控CPU使用率和队列长度**
 ```shell
 $ vmstat 1
 procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
@@ -15,9 +16,10 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  2  0      0 195710848 2394568 40864460    0    0     0   836 14008 26474  0  0 99  0  0
  1  0      0 195710848 2394568 40864588    0    0     0   111 13762 26304  0  0 99  0  0
 
-```
-vmstat报告总的CPU使用率，us为用户态CPU使用率，sy为系统态CPU使用率，id为CPU空闲率，这三者想加应该为100。vmstat 1表示每隔一秒报告CPU的使用率。
+``**
+vmstat报告总的CPU使用率，us为用户态CPU使用率，sy为系统态CPU使用率，id为CPU空闲率，这三者想加应该为100。vmstat 1表示每隔一秒报告CPU的使用率。此外，报告的第一列为CPU调度程序的运行队列长度，第二列为等待IO的进程数量
 
+**2)监控每个虚拟核心的情况**
 ```shell
 $ mpstat -P ALL 2 5
 06:29:20 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
@@ -47,6 +49,7 @@ $ mpstat -P ALL 2 5
 + %gnice: 
 + %idle: CPU空闲时间百分比
 
+**3)使用top监控CPU利用率高的进程**
 ```shell
 $ top
 top - 18:43:39 up 34 days,  3:30,  1 user,  load average: 0.87, 0.65, 0.59
@@ -55,16 +58,17 @@ Tasks: 455 total,   2 running, 453 sleeping,   0 stopped,   0 zombie
 KiB Mem : 26354177+total, 19568412+free, 24574332 used, 43283324 buff/cache
 KiB Swap:  4194300 total,  4194300 free,        0 used. 23745212+avail Mem 
 
-   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                                                                 
-106669 root      20   0   24.2g   3.1g  27712 S  11.2  1.2   4444:21 java                                                                                    
-206034 clouder+  20   0   19.3g   2.4g 199388 S   5.6  1.0   6475:30 java                                                                                    
-115048 root      20   0 3037796  72576   3208 S   5.3  0.0 298:28.20 cmf-agent                                                                               
-206051 clouder+  20   0 9615888 811164  24988 S   3.6  0.3   1525:04 java                                                                                    
-183498 yarn      20   0 3199020 651248  24944 S   1.7  0.2 118:57.18 java                                                                                    
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+106669 root      20   0   24.2g   3.1g  27712 S  11.2  1.2   4444:21 java
+206034 clouder+  20   0   19.3g   2.4g 199388 S   5.6  1.0   6475:30 java
+115048 root      20   0 3037796  72576   3208 S   5.3  0.0 298:28.20 cmf-agent
+206051 clouder+  20   0 9615888 811164  24988 S   3.6  0.3   1525:04 java
+183498 yarn      20   0 3199020 651248  24944 S   1.7  0.2 118:57.18 java  
 189769 hbase     20   0 8116260   5.5g  43200 S   1.3  2.2  69:31.43 java 
 ```
-top的上半部分是系统的统计信息
+top的上半部分是系统的统计信息，下半部分报告每个进程的CPU利用率，此外好包括内存，虚拟内存等。
 
+**4)查看某个进程中所有线程的CPU使用率**
 ```shell
 $ top -Hp 106669
 Threads: 371 total,   0 running, 371 sleeping,   0 stopped,   0 zombie
@@ -72,11 +76,13 @@ Threads: 371 total,   0 running, 371 sleeping,   0 stopped,   0 zombie
 KiB Mem : 26354177+total, 19571475+free, 24571136 used, 43255884 buff/cache
 KiB Swap:  4194300 total,  4194300 free,        0 used. 23745537+avail Mem 
 
-   PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND                                                                                  
-106895 root      20   0   24.2g   3.1g  27712 S  1.3  1.2  34:46.73 java                                                                                     
-107328 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  17:38.27 java                                                                                     
- 12821 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  55:38.78 java                                                                                     
- 64508 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  55:17.86 java                                                                                     
-  2096 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  51:48.64 java                                                                                     
-114107 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  49:50.53 java                                                                                     
+   PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+106895 root      20   0   24.2g   3.1g  27712 S  1.3  1.2  34:46.73 java
+107328 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  17:38.27 java
+ 12821 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  55:38.78 java
+ 64508 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  55:17.86 java
+  2096 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  51:48.64 java
+114107 root      20   0   24.2g   3.1g  27712 S  0.7  1.2  49:50.53 java     
 ```
+
+内存监控
